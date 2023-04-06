@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NZWalks_API.Data;
 using NZWalks_API.Models.DTO;
 using NZWalks_API.Repositories;
+using System.Data;
 
 namespace NZWalks_API.Controllers
 {
@@ -24,10 +26,11 @@ namespace NZWalks_API.Controllers
             this.walkDifficultyRepsitory = walkDifficultyRepsitory;
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllWalksAsync()
+        [Authorize(Roles = "reader")]
+        public async Task<IActionResult> GetAllWalksAsync([FromQuery] string? filterOn, [FromQuery] string? filterQuery)
         {
             // Get All Walks objects
-            var walks = await walkRepsitory.GetAllAsync();
+            var walks = await walkRepsitory.GetAllAsync(filterOn, filterQuery);
 
             // Convert Domain to DTO
             var walksDTO = mapper.Map<List<Models.DTO.Walk>>(walks);
@@ -41,6 +44,7 @@ namespace NZWalks_API.Controllers
         [HttpGet]
         [Route("{id:guid}")]
         [ActionName("GetWalkAsync")]
+        [Authorize(Roles = "reader")]
         public async Task<IActionResult> GetWalkAsync(Guid id)
         {
             //Get Walk
@@ -52,6 +56,7 @@ namespace NZWalks_API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "writer")]
         public async Task<IActionResult> AddWalkAsync([FromBody] AddWalkRequest addWalkRequest)
         {
             //Validate Request
@@ -86,6 +91,7 @@ namespace NZWalks_API.Controllers
 
         [HttpPut]
         [Route("{id:guid}")]
+        [Authorize(Roles = "writer")]
         public async Task<IActionResult> UpdateWalkAsync([FromRoute] Guid id, [FromBody] Models.DTO.UpdateWalkRequest updateWalkRequest)
         {
             //Validate the incoming request
@@ -122,6 +128,7 @@ namespace NZWalks_API.Controllers
         }
         [HttpDelete]
         [Route("{id:guid}")]
+        [Authorize(Roles = "writer")]
         public async Task<IActionResult> DeleteWalkAsync(Guid id)
         {
             //Call Repo to Delete the Walk

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NZWalks_API.Data;
 
@@ -11,9 +12,11 @@ using NZWalks_API.Data;
 namespace NZWalks_API.Migrations
 {
     [DbContext(typeof(NZWalksDbContext))]
-    partial class NZWalksDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230330165234_added Users")]
+    partial class addedUsers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -65,7 +68,7 @@ namespace NZWalks_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles");
+                    b.ToTable("Role");
                 });
 
             modelBuilder.Entity("NZWalks_API.Models.Domain.User", b =>
@@ -96,7 +99,7 @@ namespace NZWalks_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("NZWalks_API.Models.Domain.User_Role", b =>
@@ -117,7 +120,7 @@ namespace NZWalks_API.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Users_Roles");
+                    b.ToTable("User_Role");
                 });
 
             modelBuilder.Entity("NZWalks_API.Models.Domain.Walk", b =>

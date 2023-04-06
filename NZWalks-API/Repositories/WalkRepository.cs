@@ -13,13 +13,25 @@ namespace NZWalks_API.Repositories
             this.nZWalksDbContext = nZWalksDbContext;
         }
 
-        public async Task<IEnumerable<Walk>> GetAllAsync()
+        public async Task<IEnumerable<Walk>> GetAllAsync(string? filterOn = null, string? filterQuery = null)
         {
-            return await 
-                nZWalksDbContext.Walks
-                .Include(x => x.Region)
-                .Include(x => x.WalkDifficulty)
-                .ToListAsync();
+            //return await 
+            //    nZWalksDbContext.Walks
+            //    .Include(x => x.Region)
+            //    .Include(x => x.WalkDifficulty)
+            //    .ToListAsync();
+
+            var walks = nZWalksDbContext.Walks.Include(x => x.Region).Include(x => x.WalkDifficulty).AsQueryable();
+
+            if(string.IsNullOrWhiteSpace(filterOn) == false && string.IsNullOrWhiteSpace(filterQuery) == false) 
+            {
+                if(filterOn.Equals("Name", StringComparison.OrdinalIgnoreCase))
+                {
+                    walks = walks.Where(x => x.Name.Contains(filterQuery));
+                }
+            }
+
+            return await walks.ToListAsync();
         }
 
         public async Task<Walk> GetAsync(Guid id)
