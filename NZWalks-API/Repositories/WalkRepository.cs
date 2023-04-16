@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NZWalks_API.Data;
 using NZWalks_API.Models.Domain;
+using System.Xml.Linq;
 
 namespace NZWalks_API.Repositories
 {
@@ -13,7 +14,7 @@ namespace NZWalks_API.Repositories
             this.nZWalksDbContext = nZWalksDbContext;
         }
 
-        public async Task<IEnumerable<Walk>> GetAllAsync(string? filterOn = null, string? filterQuery = null)
+        public async Task<IEnumerable<Walk>> GetAllAsync(string? filterOn = null, string? filterQuery = null, string? sortBy = null, bool isAscending = true, int pageNumber = 1, int pageSize = 1000)
         {
             //return await 
             //    nZWalksDbContext.Walks
@@ -22,7 +23,7 @@ namespace NZWalks_API.Repositories
             //    .ToListAsync();
 
             var walks = nZWalksDbContext.Walks.Include(x => x.Region).Include(x => x.WalkDifficulty).AsQueryable();
-
+            // Filtering
             if(string.IsNullOrWhiteSpace(filterOn) == false && string.IsNullOrWhiteSpace(filterQuery) == false) 
             {
                 if(filterOn.Equals("Name", StringComparison.OrdinalIgnoreCase))
@@ -30,6 +31,22 @@ namespace NZWalks_API.Repositories
                     walks = walks.Where(x => x.Name.Contains(filterQuery));
                 }
             }
+            //Sorting
+            if (string.IsNullOrWhiteSpace(sortBy) == false)
+            {
+                if (sortBy.Equals("Name", StringComparison.OrdinalIgnoreCase))
+                {
+                    walks = isAscending ? walks.OrderBy(x => x.Name) : walks.OrderByDescending(x => x.Name);
+                }
+                else if (sortBy.Equals("Length", StringComparison.OrdinalIgnoreCase))
+                {
+                    walks = isAscending ? walks.OrderBy(x => x.Length) : walks.OrderByDescending(x => x.Length);
+                }
+            }
+
+            //Pagenation
+            var skipResults = (pageNumber - 1) * pageSize;
+            return await walks.Skip(skipResults).Take(pageSize).ToListAsync();
 
             return await walks.ToListAsync();
         }

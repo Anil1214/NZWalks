@@ -27,10 +27,11 @@ namespace NZWalks_API.Controllers
         }
         [HttpGet]
         [Authorize(Roles = "reader")]
-        public async Task<IActionResult> GetAllWalksAsync([FromQuery] string? filterOn, [FromQuery] string? filterQuery)
+        public async Task<IActionResult> GetAllWalksAsync([FromQuery] string? filterOn, 
+            [FromQuery] string? filterQuery, [FromQuery] string? sortBy, [FromQuery] bool? isAscending, [FromQuery] int pageNumber, [FromQuery] int pageSize)
         {
             // Get All Walks objects
-            var walks = await walkRepsitory.GetAllAsync(filterOn, filterQuery);
+            var walks = await walkRepsitory.GetAllAsync(filterOn, filterQuery, sortBy, isAscending ?? true, pageNumber, pageSize);
 
             // Convert Domain to DTO
             var walksDTO = mapper.Map<List<Models.DTO.Walk>>(walks);
